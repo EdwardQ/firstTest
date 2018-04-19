@@ -1,0 +1,150 @@
+﻿https://www.yiibai.com/git/
+
+ssh-keygen 生成 ssh密钥
+1. 检查是否生成过ssh 密钥
+cd ~/.ssh	(切换到.ssh目录，密钥存放到目录，查看有无可利用的sshkey或者是否需要重新生成)
+ls 				查看目录下所有文件
+2. 使用ssh-keygen命令生成ssh 密钥
+ssh-keygen -t rsa -C "我的SSH密钥"
+-t 生成的type  '-t rsa'参数生成了id_rsa和id_rsa.pub两个文件,'-t dsa'参数生成id_dsa私钥和id_dsa.pug公钥
+-c 'shaotuo@aiapi.com' 添加注释，一般为邮箱
+ssh-keygen --help命令查看其他参数
+将公钥提交给服务机器即可，github上面setting->SSH Key->add
+3. 使用ssh-key和git连接
+ssh -T git@github.com
+suc:git@github.com: Permission denied (publickey).
+遇到问题
+Warnning: Permanently added the RSA host key for IP address '192.30.252.128' to the list of known host(解决：配置host)
+
+
+git前的配置
+配置存放位置：
+1、/etc/gitconfig 系统对所有用户都普遍适用的配置，git config --system 命令查看
+1、~/.gitconfig 文件，用户目录下配置，git config -- global 命令查看
+2、git项目下 .git/config 仅仅针对当前项目有效, 会覆盖以上同名的配置
+
+git config -- list	查看已有配置，同名会覆盖
+修改全局化配置，项目内没有配置的姓名和邮箱，commit时会从global配置中获取
+git config --global user.name "edward"
+git config --global user.email "18513372675@163.com"
+邪恶的用法
+git config --global --replace-all user.name "shaotuo"
+
+修改指定git项目下面的配置，则cd到需要修改的git目录下，去掉--global
+git config user.name "shaotuo"
+
+git命令退出 q
+VIM 退出esc 之后shift+zz
+
+忽略文件配置.gitignore
+
+git项目目录下
+cat .git/config 	cat命令显示文件类容
+.git/config	分支，远程仓库，用户信息等配置文件
+.git/HEAD	当前所在分支，eg：ref: refs/heads/lieyou-1.3
+.git/refs/heads/	存放了各本地分支的最新指针
+.git/refs/remotes/	存放远程各分支指针
+
+创建项目
+git init
+克隆
+git clone xxxx(地址)
+克隆会获取仓库下所有数据，每一个文件的每一个版本
+git check out xxx 	还原文件
+
+创建分支
+git branch	列出可用分支
+git branch dev-shaotuo	创建名为dev-shaotuo的分支
+git branch -D dev-shaotuo	删除dev-shaotuo分支，先切换到其他分支
+git branch -m dev-shaotuo dev-st	将dev-shaotuo分支改名为dev-st，不用切到其他分支操作
+git checkout dev-shaotuo	切换分支
+git checkout -b dev-shaotuo	创建dev-shaotuo分支，并切换到该分支
+
+查看工作区状态
+git status 	当前分支、文件更改信息
+git status -s   (即--short) 简略浏览
+?? readme.md	---未追踪文件
+A  readme.md	---通过git add添加到暂存区的文件
+D  readme.md	---已从暂存区删除的文件
+   M readme.mg	---右边M表示文件修改了但未添加暂存区
+M    readme.md	---左边M表示文件修改了且添加到暂存区
+MM readme.md	---两个M表示修改了且提交到暂存区后再次修改未提交暂存区
+
+添加到暂存区
+git add xxx 开始跟踪xxx文件/文件夹，即把xxx添加到暂存区
+git add .	    将所有修改和新增文件添加到暂存区，但不包括删除
+git -u	   --update ,将所有已追踪文件的修改和删除添加到暂存区，不包括新增未追踪文件
+git -a	   --all，所有
+
+查看文件修改详细部分
+git diff	只显示未暂存的改动，已提交和已暂存看不到
+git diff --cached/--sraged 只查看已暂存修改
+
+获取最新更新
+git pull 	同步远程仓库到本地，拉取
+
+提交更新（只是本地记录）
+git commit 	一般会启动文本编辑器vim输入提交说明，esc后shift+zz保存并退出，提及commit
+git commit -m "write commit info"	-m 提交信息
+git commit -a -m "commit info"	-a 跳过提交暂存区git add，自动把所有已经跟踪过的文件暂存起来一并提交
+git commit --amend		第二次提交将代替第一次提交的结果，将本次提交和上次提交合并只有一个commit，提及漏文件后使用
+
+推送到远程仓库
+git push [remote-name] [branch-name]
+git push origin master	将master分支推送到远程服务器
+git push origin dev-st	将dev-st推送到远程dev-st上
+git push origin :master		删除origin上的master分支
+git push origin --delete master 删除origin上的master分支
+
+合并分支
+git merge origin/dev-st		在master下面，合并dev-st到master，然后git push origin master
+
+临时存储
+git stash		将保存到一个新的堆栈中，来进行其他分支的任务
+git stash list	查看已存的堆栈列表
+git stash pop	将堆栈内容还原到当前工作目录中
+
+移除文件
+git rm xxx 从已跟踪文件清单中移除(确切地说，是从暂存区域移除)，然后提交，工作目录中同样删除
+git rm --cached xxx 从暂存区中删除，工作目录中保留，所以变为为追踪状态
+rm xxx 删除文件
+
+文件改名
+git mv readme.md readme_to.md
+相当于：
+mv readme.md readme_to.md
+git rm readme.md
+git add readme_to.md
+
+查看提交历史
+git log 所有更新commit记录
+git log -p -2	-p显示每次提交的内容差异(类似git diff)，-2仅显示最近两次提交记录
+git log origin/dev-st -1	查看其他分支记录，查看dev-st最新一条推送记录
+
+文件恢复
+每个分支都有一个HEAD指针，且head指针指向最新的提交
+1、方法一
+取消暂存 git reset HEAD <file>
+撤销修改 git checkout -- xxxx
+2、方法二
+git checkout head -- xxxx
+
+回退版本
+git reset HEAD^	回退版本，一个^表示一个版本
+git reset HEAD~n	回退n个版本
+git reset commit-id 	指定特定的commit-id
+
+查看远程仓库
+git remote	列出你指定的每一个远程服务器的简写，origin为被克隆仓库的默认名
+git remote -v	远程仓库使用的 Git 保存的简写与其对应的 URL
+git remote ed 'http://xxxxx.git'		添加一个新的远程 Git 仓库，用ed命名
+git fetch origin  [remote-name]拉去仓库中你没有的信息，像其他同事的分支
+git remote rename ed shaotuo	将ed仓库改名为shaotuo
+git remote rm shaotuo	移除shaotuo
+git remote show origin	查看远程仓库更多信息
+
+跨平台换行符问题
+window下面使用换行和回车（LFCR）组合表示行结束符
+git config --global core.autocrlf true
+mac使用换行(LF)或新行作为行结束字符
+git config --global core.autocrlf input
